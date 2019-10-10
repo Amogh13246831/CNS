@@ -53,10 +53,28 @@ void CryptoKey::keygen(int codon_size, int random_seed) {
     key.insert(pair<string, int>(codons[i], value[i]));
 }
 
+string int_to_binary(int c, int num_bits) {
+  string bin = "";
+  int bit;
+  for(int i=num_bits-1; i>=0; i--) {
+    bit = (c >> i) & 0x01;
+    if(bit)
+      bin += "1";
+    else
+      bin += "0"; 
+  }
+  return bin;
+}
+
 int main(int argc, char **argv) {
   cout<<"DNA Based Encryption\n\n";
-
+  
+  string bases[] = {"A", "T", "G", "C"};
   CryptoKey k;
+  string dna = "", plaintext = "";
+  int codon_size = 2;
+  int max_bits_per_num = 2 * codon_size;
+
   cout<<"Cryptographic Key:\n";
   k.keygen(2, 1);
   for(auto itr=k.key.begin(); itr!=k.key.end(); itr++)
@@ -69,9 +87,26 @@ int main(int argc, char **argv) {
   ifstream in(argv[1], ios::in | ios::binary);
   char buffer[1];
   while(in.read(buffer, 1)) {
-    cout<<buffer[0];
+    plaintext += buffer[0];
+    // append correct base to dna
+    dna += bases[(buffer[0]>>6) & 0x03];
+    dna += bases[(buffer[0]>>4) & 0x03];
+    dna += bases[(buffer[0]>>2) & 0x03];
+    dna += bases[buffer[0] & 0x03];
+    //cout<<buffer[0]<<"\t"<<dna<<endl;
+  }
+  cout<<"Plaintext:\n"<<plaintext<<endl;
+  cout<<"DNA String\n"<<dna<<endl<<endl;
+  
+  string codon, binary_cipher;
+  int converted;
+  for(int i=0; i<dna.length(); i+=codon_size) {
+    codon = dna.substr(i, codon_size);
+    converted = k.key.find(codon)->second;
+    cout<<codon<<"\t"<<converted<<endl;
+    binary_cipher += int_to_binary(converted, max_bits_per_num);
   }
   cout<<endl;
-  
+  cout<<"Binary Ciphertext:\n"<<binary_cipher<<endl;
   return 0;
 }
