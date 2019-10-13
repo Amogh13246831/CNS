@@ -65,20 +65,7 @@ string int_to_binary(int c, int num_bits) {
   }
   return bin;
 }
-/*
-class EncryptorDecryptor {
-  private:
-  CryptoKey k;
-  static string bases[4];
-  char buffer[1];
-  int codon_size;
-  string dna;
-  string plaintext;
-  public:
-  string encrypt_file(string in_file, string out_file);
-  string decrypt_file(string in_file, string out_file);
-};
-*/
+
 // encrypt a file with DNA encryptor
 string encrypt_file(string in_file, string out_file, CryptoKey k) {
   string bases[] = {"A", "T", "G", "C"};
