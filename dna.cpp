@@ -2,6 +2,7 @@
 #include<fstream>
 #include<cstdlib>
 #include<cmath>
+#include<sys/time.h>
 #include<map>
 #include<string>
 #include<vector>
@@ -150,6 +151,7 @@ string decrypt_file(string in_file, string out_file, CryptoKey k) {
     dna += reverse_key.find(received)->second;
   }
   cout<<"DNA String\n"<<dna<<endl;
+  in.close();
 
   string bases[] = {"A", "T", "G", "C"};
   char letter = 0;
@@ -162,6 +164,13 @@ string decrypt_file(string in_file, string out_file, CryptoKey k) {
     plaintext += letter;
   }
   cout<<"Plaintext:\n"<<plaintext<<endl;
+
+  ofstream out(out_file, ios::out | ios::binary);
+  for(int i=0; i<plaintext.length(); i++) {
+    buffer[0] = plaintext[i];
+    out.write(buffer, 1);
+  }
+  out.close();
 
   return plaintext;
 }
@@ -178,8 +187,15 @@ int main(int argc, char **argv) {
   
   if(argc < 2)
     return 0;
- 
+  
+  int start = clock();
   encrypt_file(argv[1], "test.crypt", k);
-  decrypt_file("test.crypt", "", k);
+  decrypt_file("test.crypt", "outtest.png", k);
+  int end = clock();
+
+  float time_ms = (end-start) * 1000000 / CLOCKS_PER_SEC;
+  cout<<"System clock rate: "<<CLOCKS_PER_SEC<<endl<<endl;
+  cout<<"Time Elapsed: "<<time_ms<<" us"<<endl<<endl;  
+
   return 0;
 }
