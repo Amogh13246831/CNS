@@ -177,25 +177,38 @@ string decrypt_file(string in_file, string out_file, CryptoKey k) {
 
 int main(int argc, char **argv) {
   cout<<"DNA Based Encryption\n\n";
-
+ 
+  int seed;
   CryptoKey k;
-  cout<<"Cryptographic Key:\n";
-  k.keygen(2, 1);
+  cout<<"CRYPTOGRAPHIC KEY:\nEnter a seed for the RNG: ";
+  cin>>seed;
+  k.keygen(2, seed);
   for(auto itr=k.key.begin(); itr!=k.key.end(); itr++)
     cout<<itr->first<<"\t"<<itr->second<<endl;
-  cout<<endl;
+  cout<<endl<<endl;
   
-  if(argc < 2)
-    return 0;
-  
-  int start = clock();
-  encrypt_file(argv[1], "test.crypt", k);
-  decrypt_file("test.crypt", "outtest.png", k);
-  int end = clock();
+  string messagefile, cryptfile, decryptfile; 
+  int start, end;
+  float time_ms;
+  cout<<"Enter the message filename: ";
+  cin>>messagefile;
+  cout<<endl<<endl;
 
-  float time_ms = (end-start) * 1000000 / CLOCKS_PER_SEC;
-  cout<<"System clock rate: "<<CLOCKS_PER_SEC<<endl<<endl;
-  cout<<"Time Elapsed: "<<time_ms<<" us"<<endl<<endl;  
+  cout<<"ENCRYPTION\nEnter the encryption target filename: ";
+  cin>>cryptfile; 
+  start = clock();
+  encrypt_file(messagefile, cryptfile, k);  // run encryption
+  end = clock();
+  time_ms = (end-start) * 1000000 / CLOCKS_PER_SEC;
+  cout<<"Encryption time: "<<time_ms<<" microseconds"<<endl<<endl; 
+  
+  cout<<"DECRYPTION\nEnter the encryption target filename: ";
+  cin>>decryptfile; 
+  start = clock();
+  decrypt_file(cryptfile, decryptfile, k);  // run decryption
+  end = clock();
+  time_ms = (end-start) * 1000000 / CLOCKS_PER_SEC;
+  cout<<"Decryption time: "<<time_ms<<" microseconds"<<endl<<endl; 
 
   return 0;
 }
