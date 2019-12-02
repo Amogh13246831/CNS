@@ -86,20 +86,20 @@ string encrypt_file(string in_file, string out_file, CryptoKey k) {
     //cout<<buffer[0]<<"\t"<<dna<<endl;
   }
   in.close();
-  cout<<"Plaintext:\n"<<plaintext<<endl;
-  cout<<"DNA String\n"<<dna<<endl<<endl;
+  //cout<<"Plaintext:\n"<<plaintext<<endl;
+  //cout<<"DNA String\n"<<dna<<endl<<endl;
   
   string codon, binary_cipher;
   int converted;
   for(int i=0; i<dna.length(); i+=codon_size) {
     codon = dna.substr(i, codon_size);
     converted = k.key.find(codon)->second;
-    cout<<codon<<"\t"<<converted<<endl;
+    //cout<<codon<<"\t"<<converted<<endl;
     binary_cipher += int_to_binary(converted, max_bits_per_num);
     // out.write(4 bits of converted) to store actual bits
   }
   cout<<endl;
-  cout<<"Binary Ciphertext:\n"<<binary_cipher<<endl<<endl;
+  //cout<<"Binary Ciphertext:\n"<<binary_cipher<<endl<<endl;
 
   ofstream out(out_file, ios::out | ios::binary);
   int write_num;
@@ -150,7 +150,7 @@ string decrypt_file(string in_file, string out_file, CryptoKey k) {
     received = (int) (buffer[0] & 0x0f);
     dna += reverse_key.find(received)->second;
   }
-  cout<<"DNA String\n"<<dna<<endl;
+  //cout<<"DNA String\n"<<dna<<endl;
   in.close();
 
   string bases[] = {"A", "T", "G", "C"};
@@ -163,7 +163,7 @@ string decrypt_file(string in_file, string out_file, CryptoKey k) {
     letter += match_letter(dna[i+3]) & 0x03;
     plaintext += letter;
   }
-  cout<<"Plaintext:\n"<<plaintext<<endl;
+  //cout<<"Plaintext:\n"<<plaintext<<endl;
 
   ofstream out(out_file, ios::out | ios::binary);
   for(int i=0; i<plaintext.length(); i++) {
@@ -182,33 +182,36 @@ int main(int argc, char **argv) {
   CryptoKey k;
   cout<<"CRYPTOGRAPHIC KEY:\nEnter a seed for the RNG: ";
   cin>>seed;
+  cout<<"Generated key:\n";
   k.keygen(2, seed);
   for(auto itr=k.key.begin(); itr!=k.key.end(); itr++)
     cout<<itr->first<<"\t"<<itr->second<<endl;
   cout<<endl<<endl;
   
   string messagefile, cryptfile, decryptfile; 
-  int start, end;
+  long start, end;
   float time_ms;
-  cout<<"Enter the message filename: ";
-  cin>>messagefile;
-  cout<<endl<<endl;
 
-  cout<<"ENCRYPTION\nEnter the encryption target filename: ";
+  cout<<"Encryption\nEnter the plaintext filename: ";
+  cin>>messagefile;
+  cout<<"Enter the encryption target filename: ";
   cin>>cryptfile; 
+  cout<<"\nDECRYPTION\nEnter the encrypted filename: ";
+  cin>>cryptfile; 
+  cout<<"Enter the destination filename: ";
+  cin>>decryptfile;
+
   start = clock();
   encrypt_file(messagefile, cryptfile, k);  // run encryption
   end = clock();
-  time_ms = (end-start) * 1000000 / CLOCKS_PER_SEC;
-  cout<<"Encryption time: "<<time_ms<<" microseconds"<<endl<<endl; 
+  time_ms = (end-start) * 1000 / CLOCKS_PER_SEC;
+  cout<<"Encryption time: "<<time_ms<<" milliseconds"<<endl<<endl; 
   
-  cout<<"DECRYPTION\nEnter the encryption target filename: ";
-  cin>>decryptfile; 
   start = clock();
   decrypt_file(cryptfile, decryptfile, k);  // run decryption
   end = clock();
-  time_ms = (end-start) * 1000000 / CLOCKS_PER_SEC;
-  cout<<"Decryption time: "<<time_ms<<" microseconds"<<endl<<endl; 
+  time_ms = (end-start) * 1000 / CLOCKS_PER_SEC;
+  cout<<"Decryption time: "<<time_ms<<" milliseconds"<<endl<<endl; 
 
   return 0;
 }
